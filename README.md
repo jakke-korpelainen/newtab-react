@@ -8,3 +8,8 @@ Backgrounds used are hosted in Cloudinary CDN
 
 	npm install
 	gulp browserify
+
+#Screenshot
+![1](http://res.cloudinary.com/jakke/image/upload/v1438871168/newtab_qnm5rl.png "Screenshot 1")
+
+	
