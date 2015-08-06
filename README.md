@@ -11,5 +11,6 @@ Backgrounds used are hosted in Cloudinary CDN
 
 #Screenshot
 ![1](http://res.cloudinary.com/jakke/image/upload/v1438871168/newtab_qnm5rl.png "Screenshot 1")
-
+![2](http://res.cloudinary.com/jakke/image/upload/v1438871333/newtab2_oy9ecy.png "Screenshot 2")
+![3](http://res.cloudinary.com/jakke/image/upload/v1438871281/newtab-settings_a75ey5.png "Screenshot 3")
 	
