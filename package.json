@@ -1,0 +1,33 @@
+{
+  "name": "newtab-react",
+  "version": "1.0.0",
+  "description": "New Tab, powered by ReactJs",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "backbone": "^1.2.1",
+    "browserify": "^11.0.1",
+    "connect": "^3.4.0",
+    "forever": "^0.15.1",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "jquery": "^2.1.4",
+    "moment": "^2.10.6",
+    "moment-timezone": "^0.4.0",
+    "react": "^0.13.3",
+    "react-timer-mixin": "^0.13.2",
+    "reactify": "^1.1.1",
+    "serve-static": "^1.10.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "newtab-react"
+  },
+  "author": "Jakke Korpelainen",
+  "license": "MIT"
+}
