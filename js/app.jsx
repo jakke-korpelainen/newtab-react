@@ -49,6 +49,7 @@ var Settings = React.createClass({
 
     handleClick: function(e) {
         setData("user", this.state);
+        router.navigate('dashboard', {trigger: true});
     },
 
     handleChange: function(event) {
@@ -153,7 +154,7 @@ var Settings = React.createClass({
                 <section>
                     <h2>Actions</h2>
                     <div className="form-group">
-                        <a href="/" className="button" onClick={this.handleClick}>Save</a>
+                        <a href="#" className="button" onClick={this.handleClick}>Save</a>
                     </div>
                 </section>
             </div>
@@ -373,7 +374,8 @@ var App = React.createClass({
 var Router = Backbone.Router.extend({
   routes : {
     '':  'default',
-    'settings' : 'settings'
+    'settings' : 'settings',
+    'dashboard' : 'default'
   },
   default: function() {
     React.render(
