@@ -362,6 +362,12 @@ var App = React.createClass({
                         <Clock name={storedData.name}/>
                         {weather}
                     </aside>
+
+                    <svg id="loading" height="32" width="32">
+                      <polygon points="1,16 16,1 16,16" style={{ fill: 'transparent', stroke:'white', strokeWidth: 2}} />
+                      <polygon points="16,16, 16,31 31,16" style={{ fill: 'transparent', stroke:'white', strokeWidth: 2}} />
+                    </svg>
+
                     <Background />
                 </section>
             );

@@ -363,6 +363,12 @@ var App = React.createClass({displayName: "App",
                         React.createElement(Clock, {name: storedData.name}), 
                         weather
                     ), 
+
+                    React.createElement("svg", {id: "loading", height: "32", width: "32"}, 
+                      React.createElement("polygon", {points: "1,16 16,1 16,16", style: { fill: 'transparent', stroke:'white', strokeWidth: 2}}), 
+                      React.createElement("polygon", {points: "16,16, 16,31 31,16", style: { fill: 'transparent', stroke:'white', strokeWidth: 2}})
+                    ), 
+
                     React.createElement(Background, null)
                 )
             );
