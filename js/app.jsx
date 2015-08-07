@@ -8,10 +8,9 @@ var TimerMixin = require("react-timer-mixin");
 var Backbone = require("backbone");
 
 var moment = require("moment");
-    moment = require("moment-timezone");
+moment().utc();
 
 var storageAffix = "newtab-";
-moment.tz.add('Europe/Helsinki');
 
 function getData(name) {
     var data = localStorage[storageAffix + name];
@@ -32,7 +31,7 @@ var Settings = React.createClass({
     getInitialState: function() {
         return {
             name: 'Old chump',
-            city: 'Helsinki',
+            city: 'Auto',
             showWeather: true,
             showTemperature: true,
             showWindSpeed: false,
@@ -97,7 +96,7 @@ var Settings = React.createClass({
                             <input id="name" value={this.state.name} onChange={this.handleChange} placeholder="Your name." type="text"/>
                         </div>
                         <div className="form-item form-space-after">
-                            <label htmlFor="city">City</label>
+                            <label htmlFor="city">Location</label>
                             <input id="city" value={this.state.city} onChange={this.handleChange} placeholder="City to provide a forecast for." type="text"/>
                         </div>
                     </div>
@@ -291,51 +290,168 @@ var Weather = React.createClass({
         this.getWeather();
         this.setInterval(
           function () { this.getWeather(); }.bind(this),
-          60000
+          15000
         );
     },
 
-    getWeather: function() {
+    getDecimalsBetween: function(current, target, delay, callback) {
+        return new Promise(function(resolve) {
+            var arr = [];
+            var runningValue = current;
 
+            var index = 0;
+            while (parseFloat(runningValue) != parseFloat(target))
+            {
+                var difference = ( parseFloat(runningValue) - parseFloat(target) ).toFixed(1)
+                var tick = 0;
+                if (parseFloat(difference) > 0) {
+                    // 20.0 -> 19.0 = 1
+                    // colder than before -0.1
+                    runningValue = (parseFloat(runningValue) - parseFloat(0.1)).toFixed(1);
+                } else if (parseFloat(difference) < 0) {
+                    // 19.0 -> 29.0 = -1
+                    // warmer than before +0.1
+                    runningValue = (parseFloat(runningValue) + parseFloat(0.1)).toFixed(1);
+                }
+                
+                arr[index] = parseFloat(runningValue).toFixed(1);
+                index ++;
+            }
+
+            resolve(arr);
+        });
+    },
+
+    setDeceleratingTimeout: function(callback, factor, times) {
+      var internalCallback = function( t, counter )
+      {
+        return function()
+        {
+          if ( --t > 0 )
+          {
+            window.setTimeout( internalCallback, ++counter * factor );
+            callback();
+          }
+        }
+      }( times, 0 );
+
+      window.setTimeout( internalCallback, factor );
+    },
+
+    getWeather() {
+        console.log('Fetching forecast');
+        var userData = getData("user");
+        var url;
+
+        if (userData.city.toLowerCase() == 'auto')
+        {
+            navigator.geolocation.getCurrentPosition(function (loc) {
+                url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + loc.coords.latitude + '&lon=' + loc.coords.longitude + '&units=metric';
+                this.getWeatherForUrl(url);
+            }.bind(this));
+        } else {
+            url = 'http://api.openweathermap.org/data/2.5/weather?q=' + userData.city + '&units=metric';
+            this.getWeatherForUrl(url);
+        }
+    },
+
+    getWeatherForUrl: function(url) {
         var now = moment();
-        var storedData = getData(this.state.storageId);
-        if (storedData == null 
-            || storedData.city != this.props.city
-            || now.diff(moment(storedData.lastUpdated).tz("Europe/Helsinki"), 'minutes') >= 15) {
-                $.get('http://api.openweathermap.org/data/2.5/weather?q=' + this.props.city + '&units=metric', function(result) {
+        var userData = getData("user");
+        var weatherData = getData(this.state.storageId);
+        if (weatherData == null 
+            || userData == null
+            || userData.city != weatherData.weather.city
+            || now.diff(moment(weatherData.lastUpdated), 'minutes') >= 1) {
+                $.get(url, function(result) {
 
                 var data = {
                     weather: { 
                         temp: parseFloat((Math.round(result.main.temp * 10) / 10).toFixed(1)),
                         wind: result.wind.speed,
-                        city: this.props.city
+                        city: result.name
                     },
                     lastUpdated: now
                 };
+                
+                if (this.state.weather.temp != data.weather.temp)
+                {
+                    this.getDecimalsBetween(this.state.weather.temp, data.weather.temp, 50).then(function(arr) {
+                        var startPos = (arr.length - arr.length / 15).toFixed(0);
+                        this.setDeceleratingTimeout(function() {
+                            var newData = data;
+                            newData.weather.temp = arr[startPos];
+                            this.setState(newData);
+                            startPos++;
+                        }.bind(this), 50, arr.length - startPos);
+                    }.bind(this));
+                }
 
-                this.setState(data);
-                setData(this.state.storageId, data);
+                this.setState( data );
+                setData(this.state.storageId,  data );
             }.bind(this))
         } else {
-            this.setState({
-                weather: storedData.weather
-            });
+            this.setState( weatherData );
         }
+    },
+
+    getWindText: function(ms) {
+        if (ms >= 12)
+            return 'Hurricane force';
+        if (ms >= 11)
+            return 'Violent storm';
+        if (ms >= 10)
+            return 'Whole gale';
+        if (ms >= 9)
+            return 'Severe gale';
+        if (ms >= 8)
+            return 'Gale';
+        if (ms >= 7)
+            return 'Moderate gale';
+        if (ms >= 6)
+            return 'Strong breeze';
+        if (ms >= 5)
+            return 'Fresh breeze';
+        if (ms >= 4)
+            return 'Moderate breeze';
+        if (ms >= 3)
+            return 'Gentle breeze';
+        if (ms >= 2)
+            return 'Light breeze';
+        if (ms >= 1)
+            return 'Light air';
+        if (ms >= 0)
+            return 'Calm';
     },
 
     render: function() {
 
-        var storedData = getData("user");
-        var temperature = storedData.showTemperature ? <div id="temp">{this.state.weather.temp} <span id="tempUnit">&deg;C</span></div> : null;
-        var windSpeed = storedData.showWindSpeed ? <div id="wind">{this.state.weather.wind} <span id="windUnit">m/s</span></div> : null;
+        var userData = getData("user");
+
+        var temperature = userData.showTemperature ? (
+                <div className="temperature">
+                    <div id="temp">
+                        {this.state.weather.temp} 
+                        <span id="tempUnit">&deg;C</span>
+                    </div>
+                    <span id="location">{this.state.weather.city}</span>
+                </div>
+            ) : null;
+
+        var wind = userData.showWindSpeed ? (
+                <div className="wind">
+                    <div id="wind">
+                        {this.state.weather.wind} 
+                        <span id="windUnit">m/s</span>
+                    </div>
+                    <span id="windText">{this.getWindText(this.state.weather.wind)}</span>
+                </div>
+            ) : null;
 
         return (
             <div id="weather">
-                <div className="weather-top">
-                    {temperature}
-                    {windSpeed}
-                </div>
-                <span id="location">{this.props.city}</span>
+                {temperature}
+                {wind}                
             </div>
         );
     }

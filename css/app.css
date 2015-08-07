@@ -169,11 +169,15 @@ hr {
 	display: block;
 }
 
-.weather-top div:first-of-type {
+#weather div:first-of-type {
 	margin-right: 30px;
 }
 
-#temp, #wind {
+#weather div div {
+	width: 100%;
+}
+
+.temperature, .wind {
 	float: left;
 }
 
@@ -181,7 +185,7 @@ hr {
 	font-size: 32px;
 }
 
-#location, #greeting {
+#location, #greeting, #windText {
 	clear: both;
 	letter-spacing: 2px;
 	font-weight: 100;
