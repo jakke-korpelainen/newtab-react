@@ -213,7 +213,7 @@ var Background = React.createClass({
     },
 
     randomImage : function() {
-        var imgSrc = "http://res.cloudinary.com/jakke/image/upload/c_crop,g_center,h_1240,w_1920/v1438865317/NewTab/" + this.random() + ".jpg";
+        var imgSrc = "https://res.cloudinary.com/jakke/image/upload/c_crop,g_center,h_1440,w_2560/v1438865317/NewTab/" + this.random() + ".jpg";
         return imgSrc;
     },
 
