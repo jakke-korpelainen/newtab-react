@@ -1,16 +1,17 @@
-/*
-    TODO:   Templates (Dark/Light)       
-*/
-
 var $ = require("jquery");
 var React = require("react");
 var TimerMixin = require("react-timer-mixin");
-var Backbone = require("backbone");
+var ReactRouter = require('react-router')
+var Router = ReactRouter.Router
+var Navigation = ReactRouter.Navigation
+var Route = ReactRouter.Route
+var Link = ReactRouter.Link
 
 var moment = require("moment");
 moment().utc();
 
 var storageAffix = "newtab-";
+var weatherApiBase = "http://api.openweathermap.org/data/2.5/weather?APPID=732e78b853a08a9dfdeeba03592cf1aa";
 
 function getData(name) {
     var data = localStorage[storageAffix + name];
@@ -28,6 +29,9 @@ function delData(name)
 }
 
 var Settings = React.createClass({
+
+    mixins: [Navigation],
+
     getInitialState: function() {
         return {
             name: 'Old chump',
@@ -48,7 +52,6 @@ var Settings = React.createClass({
 
     handleClick: function(e) {
         setData("user", this.state);
-        router.navigate('dashboard', {trigger: true});
     },
 
     handleChange: function(event) {
@@ -202,7 +205,7 @@ var Background = React.createClass({
 
     onImageLoad: function(event) {
         this.setState({loaded: true, src: event.target.src});
-        $('img').stop().fadeIn(1000);
+        $('img').stop().fadeIn(500);
     },
 
     random: function() {
@@ -259,7 +262,7 @@ var Clock = React.createClass({
         return (
             <div id="clock">
                 <div id="dial">{this.state.currentTime}</div>
-                <span id="greeting">Hello {this.props.name}</span> <a href="#/settings" className="edit">(settings)</a>
+                <span id="greeting">Hello {this.props.name}</span> <Link className="edit" to={'/settings'}>(settings)</Link>
             </div>
 
         );
@@ -290,7 +293,7 @@ var Weather = React.createClass({
         this.getWeather();
         this.setInterval(
           function () { this.getWeather(); }.bind(this),
-          15000
+          60000
         );
     },
 
@@ -345,12 +348,13 @@ var Weather = React.createClass({
 
         if (userData.city.toLowerCase() == 'auto')
         {
+            //TODO: Save the current position instead of polling it constantly
             navigator.geolocation.getCurrentPosition(function (loc) {
-                url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + loc.coords.latitude + '&lon=' + loc.coords.longitude + '&units=metric';
+                url = weatherApiBase + '&lat=' + loc.coords.latitude + '&lon=' + loc.coords.longitude + '&units=metric';
                 this.getWeatherForUrl(url);
             }.bind(this));
         } else {
-            url = 'http://api.openweathermap.org/data/2.5/weather?q=' + userData.city + '&units=metric';
+            url = weatherApiBase + '&q=' + userData.city + '&units=metric';
             this.getWeatherForUrl(url);
         }
     },
@@ -493,26 +497,9 @@ var App = React.createClass({
     }
 });
 
-var Router = Backbone.Router.extend({
-  routes : {
-    '':  'default',
-    'settings' : 'settings',
-    'dashboard' : 'default'
-  },
-  default: function() {
-    React.render(
-      <App />,
-      document.getElementById("view")
-    );
-  }.bind(React),
-  settings : function() {
-    React.render(
-      <Settings />,
-      document.getElementById("view")
-    );
-  }.bind(React)
-});
-
-var router = new Router();
-
-Backbone.history.start();
+React.render((
+  <Router>
+    <Route path="/" component={App}/>
+    <Route path="/settings" component={Settings}/>
+  </Router>
+), document.body)

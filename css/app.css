@@ -1,7 +1,7 @@
 html, body { margin: 0; padding: 0;}
 
 body {
-	font-family: "proxima-nova" sans-serif;
+	font-family: "montserrat", sans-serif;
 	max-height: 100%;
 	background: #000;
 	overflow: hidden;
@@ -33,7 +33,7 @@ input[type='text']:hover, input[type='text']:focus {
 
 
 h1 {
-	font-size: 82px;
+	font-size: 72px;
 }
 
 #loading {
@@ -162,7 +162,7 @@ hr {
 	margin-bottom: .2em;
 	padding-bottom: .1em;
 	border-bottom: 1px solid white;
-	font-size: 82px;
+	font-size: 72px;
 }
 
 .weather-top {
@@ -233,7 +233,7 @@ a.edit {
 }
 .onoffswitch-inner:before, .onoffswitch-inner:after {
     display: block; float: left; width: 50%; height: 29px; padding: 0; line-height: 30px;
-    font-size: 16px; color: white; font-family: 'proxima-nova',Trebuchet, Arial, sans-serif; font-weight: bold;
+    font-size: 16px; color: white; font-family: 'montserrat',Trebuchet, Arial, sans-serif; font-weight: bold;
     box-sizing: border-box;
 }
 .onoffswitch-inner:before {
